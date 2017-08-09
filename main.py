@@ -7,15 +7,31 @@ headers = {
     'From': 'bloopetybleep@domain.com'
 }
 
+i = 0
 output = ""
+curr = "https://www.reddit.com/r/Showerthoughts/top/"
 
-for url in ["https://www.reddit.com/r/Showerthoughts/hot/", "https://www.reddit.com/r/Showerthoughts/new/", "https://www.reddit.com/r/Showerthoughts/rising/"]:
-    r  = requests.get(url, headers = headers)
+while True:
+    if i > 50:
+        break
+
+    r  = requests.get(curr, headers = headers)
     data = r.text
     soup = BeautifulSoup(data, "lxml")
 
     for link in soup.find_all("p", {"class": "title"}):
         output += link.find_all("a")[0].string + "\n"
+
+    try:
+        curr = soup.find_all("a", {"rel": "next"})[0].get("href")
+
+    except IndexError:
+        break
+
+    else:
+        i += 1
+
+
 
 
 with open("text.txt", "w") as f:
